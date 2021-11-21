@@ -155,7 +155,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSize: 50
   seed: 0
-  floorRatio: 50
+  initialWallChance: 50
+  caIterations: 3
+  wallNeighborhoodThreshhold: 5
+  mooreNeighborHoodSize: 1
   cellularAutomatonVisualizer: {fileID: 98105765}
 --- !u!4 &98105764
 Transform:
