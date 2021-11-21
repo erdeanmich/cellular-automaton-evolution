@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace CellularAutomaton
     
         void Start()
         {
-            StartSimulation();
+            StartSimulationSlow();
         }
 
         public void StartSimulation()
@@ -40,7 +41,23 @@ namespace CellularAutomaton
             for (int i = 0; i < caIterations; i++)
             {
                 UpdateAutomaton();
+            }
+            VisualizeAutomaton();
+        }
+
+        public void StartSimulationSlow()
+        {
+            InitializeAutomaton();
+            StartCoroutine(SimulateAutomatonStepByStep());
+        }
+
+        private IEnumerator SimulateAutomatonStepByStep()
+        {
+            for (int i = 0; i < caIterations; i++)
+            {
+                UpdateAutomaton();
                 VisualizeAutomaton();
+                yield return new WaitForSeconds(1);
             }
         }
 

@@ -4,7 +4,7 @@ namespace CellularAutomaton
 {
     public class CellularAutomatonVisualizer : MonoBehaviour
     {
-        [SerializeField]
+        [SerializeField] 
         private GameObject cellPrefab;
 
         [SerializeField]
@@ -12,11 +12,24 @@ namespace CellularAutomaton
         
         public void VisualizeAutomaton(int[,] cells)
         {
+            DestroyExistingCells();
+
             for (int x = 0; x < cells.GetLength(0); x++)
             {
-                for(int y = 0; y < cells.GetLength(1); y++)
+                for (int y = 0; y < cells.GetLength(1); y++)
                 {
-                    SpawnCell(x,y, cells[x,y]);
+                    SpawnCell(x, y, cells[x, y]);
+                }
+            }
+        }
+
+        private void DestroyExistingCells()
+        {
+            if (transform.childCount != 0)
+            {
+                foreach (Transform child in transform)
+                {
+                    Destroy(child.gameObject);
                 }
             }
         }
@@ -28,6 +41,6 @@ namespace CellularAutomaton
             cell.SetPosition(x,y);
             CellType type = (CellType)cellType;
             cell.SetCellType(type);
-        } 
+        }
     }
 }

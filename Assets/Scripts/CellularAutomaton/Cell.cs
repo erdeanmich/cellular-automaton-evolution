@@ -12,7 +12,7 @@ namespace CellularAutomaton
 
         public void SetPosition(int x, int y)
         {
-            transform.position = new Vector3(x, y);
+            transform.localPosition = new Vector3(x, y);
         }
 
         public void SetCellType(CellType type)
