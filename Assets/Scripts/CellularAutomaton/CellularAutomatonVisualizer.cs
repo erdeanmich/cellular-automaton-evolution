@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace CellularAutomaton
 {
@@ -8,11 +9,15 @@ namespace CellularAutomaton
         private GameObject cellPrefab;
 
         [SerializeField]
-        private Transform gridParent;
+        private RectTransform gridParent;
+
+        [SerializeField] 
+        private RectTransform targetFrame;
         
         public void VisualizeAutomaton(int[,] cells)
         {
             DestroyExistingCells();
+            ScaleGridToTargetFrame(cells);
 
             for (int x = 0; x < cells.GetLength(0); x++)
             {
@@ -21,6 +26,19 @@ namespace CellularAutomaton
                     SpawnCell(x, y, cells[x, y]);
                 }
             }
+        }
+
+        private void ScaleGridToTargetFrame(int[,] cells)
+        {
+            var gridLength = cells.GetLength(0);
+            var rect = targetFrame.rect;
+            var sizeDelta = targetFrame.sizeDelta;
+            
+            gridParent.position = new Vector3(rect.xMin, rect.yMin);
+            gridParent.sizeDelta = new Vector2(gridLength, gridLength);
+            var scaleRatioX = sizeDelta.x / gridLength;
+            var scaleRatioY = sizeDelta.y / gridLength;
+            gridParent.localScale = new Vector3(scaleRatioX, scaleRatioY, 1);
         }
 
         private void DestroyExistingCells()

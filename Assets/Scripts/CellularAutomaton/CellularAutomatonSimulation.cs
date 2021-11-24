@@ -14,7 +14,7 @@ namespace CellularAutomaton
 
         [SerializeField]
         [Range(0,100)]
-        private int initialWallChance;
+        private float initialWallChance;
 
         [SerializeField] 
         private int caIterations;
@@ -32,7 +32,6 @@ namespace CellularAutomaton
     
         void Start()
         {
-            StartSimulationSlow();
         }
 
         public void StartSimulation()
@@ -55,15 +54,15 @@ namespace CellularAutomaton
         {
             for (int i = 0; i < caIterations; i++)
             {
-                UpdateAutomaton();
                 VisualizeAutomaton();
+                UpdateAutomaton();
                 yield return new WaitForSeconds(1);
             }
+            VisualizeAutomaton();
         }
 
         private void InitializeAutomaton()
         {
-            RetrieveSeed();
             InitializeCellGrid();
             VisualizeAutomaton();
         }
@@ -89,14 +88,7 @@ namespace CellularAutomaton
             Debug.Log(cells);
         }
 
-        private void RetrieveSeed()
-        {
-            if (seed == 0)
-            {
-                seed = Time.time.ToString(CultureInfo.CurrentCulture).GetHashCode();
-                Debug.Log($"Current seed is {seed}");
-            }
-        }
+        
 
         private void UpdateAutomaton()
         {
@@ -149,6 +141,15 @@ namespace CellularAutomaton
         private bool IsOffsetOutOfBounds(int offset)
         {
             return offset < 0 || offset > gridSize - 1;
+        }
+
+        public void SetConfig(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
+        {
+            seed = cellularAutomatonSimulationConfig.Seed;
+            initialWallChance = cellularAutomatonSimulationConfig.R;
+            caIterations = cellularAutomatonSimulationConfig.N;
+            mooreNeighborHoodSize = cellularAutomatonSimulationConfig.M;
+            wallNeighborhoodThreshhold = cellularAutomatonSimulationConfig.T;
         }
     }
 }
