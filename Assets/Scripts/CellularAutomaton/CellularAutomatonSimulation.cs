@@ -80,7 +80,8 @@ namespace CellularAutomaton
             {
                 for (int y = 0; y < gridSize; y++)
                 {
-                    cells[x, y] = Random.Range(0, 100) <= initialWallChance ? 1 : 0;
+                    var random = Random.Range(0, 100);
+                    cells[x, y] = random <= initialWallChance ? 1 : 0;
                 }
             }
             
@@ -150,6 +151,7 @@ namespace CellularAutomaton
             caIterations = cellularAutomatonSimulationConfig.N;
             mooreNeighborHoodSize = cellularAutomatonSimulationConfig.M;
             wallNeighborhoodThreshhold = cellularAutomatonSimulationConfig.T;
+            gridSize = cellularAutomatonSimulationConfig.GridSize;
         }
     }
 }

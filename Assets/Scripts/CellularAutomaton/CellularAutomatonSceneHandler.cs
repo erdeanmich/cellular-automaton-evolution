@@ -16,6 +16,9 @@ namespace CellularAutomaton
         [Header("Simulation Inputs")]
         [SerializeField]
         private InputField seedInput;
+        
+        [SerializeField]
+        private InputField gridSizeInput;
 
         [SerializeField]
         private InputField rInput;
@@ -57,11 +60,17 @@ namespace CellularAutomaton
         {
             return new CellularAutomatonSimulationConfig(
                 RetrieveSeed(),
+                RetrieveGridSize(),
                 RetrieveR(),
                 RetrieveN(),
                 RetrieveT(),
                 RetrieveM()
             );
+        }
+
+        private int RetrieveGridSize()
+        {
+            return Convert.ToInt32(gridSizeInput.text);
         }
 
         private int RetrieveM()
@@ -90,7 +99,7 @@ namespace CellularAutomaton
             if (_seed == 0)
             {
                 _seed = Time.time.ToString(CultureInfo.CurrentCulture).GetHashCode();
-                Debug.Log($"Current seed is {seedInput}");
+                Debug.Log($"Current seed is {_seed}");
             }
 
             return _seed;
