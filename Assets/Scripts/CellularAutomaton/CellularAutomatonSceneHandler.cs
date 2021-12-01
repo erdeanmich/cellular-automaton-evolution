@@ -46,6 +46,8 @@ namespace CellularAutomaton
 
         private void Start()
         {
+            SetFileBrowserFilters();
+
             startCAButton.onClick.AddListener(OnClickStart);
             exportCAButton.onClick.AddListener(OnClickExport);
             importCAButton.onClick.AddListener(OnClickImport);
@@ -79,20 +81,53 @@ namespace CellularAutomaton
 
         private IEnumerator ShowImportAutomatonDialog()
         {
-            yield break;
+            yield return FileBrowser.WaitForLoadDialog(
+                FileBrowser.PickMode.Files,
+                false,
+                null,
+                CellularAutomataConstants.ImportDialogTitle,
+                CellularAutomataConstants.ImportButtonText
+            );
+
+            if (!FileBrowser.Success)
+            {
+                yield break;
+            }
+
+            var pathToFile = FileBrowser.Result[0];
+            ImportAutomatonFromFile(pathToFile);
+        }
+
+        private void ImportAutomatonFromFile(string pathToFile)
+        {
+            var caJson = FileBrowserHelpers.ReadTextFromFile(pathToFile);
+
+            try
+            {
+                var cellularAutomatonSimulationConfig = JsonUtility.FromJson<CellularAutomatonSimulationConfig>(caJson);
+                rInput.text = cellularAutomatonSimulationConfig.R.ToString(CultureInfo.CurrentCulture);
+                nInput.text = cellularAutomatonSimulationConfig.N.ToString(CultureInfo.CurrentCulture);
+                tInput.text = cellularAutomatonSimulationConfig.T.ToString(CultureInfo.CurrentCulture);
+                mInput.text = cellularAutomatonSimulationConfig.M.ToString(CultureInfo.CurrentCulture);
+                gridSizeInput.text = cellularAutomatonSimulationConfig.GridSize.ToString(CultureInfo.CurrentCulture);
+                seedInput.text = cellularAutomatonSimulationConfig.Seed.ToString(CultureInfo.CurrentCulture);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                Debug.LogError($"Not possible to parse cellular automaton json at {pathToFile}");
+            }
         }
 
         private IEnumerator ShowExportAutomatonToDialog()
         {
-            FileBrowser.SetFilters(true, CellularAutomataConstants.ExportFileFilter);
-            FileBrowser.SetDefaultFilter(CellularAutomataConstants.DefaultExportFileFilter);
             yield return FileBrowser.WaitForSaveDialog(
                 FileBrowser.PickMode.Files,
                 false,
                 null, 
                 CellularAutomataConstants.InitialExportFilename, 
                 CellularAutomataConstants.ExportDialogTitle,
-                CellularAutomataConstants.ExportSaveButtonText
+                CellularAutomataConstants.ExportButtonText
             );
 
             if (!FileBrowser.Success)
@@ -103,6 +138,12 @@ namespace CellularAutomaton
             // only one possible path here
             var pathToFile = FileBrowser.Result[0];
             ExportCurrentCaConfigToFile(pathToFile);
+        }
+
+        private static void SetFileBrowserFilters()
+        {
+            FileBrowser.SetFilters(true, CellularAutomataConstants.ExportFileFilter);
+            FileBrowser.SetDefaultFilter(CellularAutomataConstants.DefaultExportFileFilter);
         }
 
         private void ExportCurrentCaConfigToFile(string pathToFile)
@@ -117,7 +158,7 @@ namespace CellularAutomaton
 
         private CellularAutomatonSimulationConfig CreateCellularAutomatonSimulationConfig()
         {
-            // add error handling 
+            // TODO add error handling 
             return new CellularAutomatonSimulationConfig(
                 RetrieveSeed(),
                 RetrieveGridSize(),
