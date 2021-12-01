@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Globalization;
 using UnityEngine;
 
 namespace CellularAutomaton
@@ -86,7 +85,6 @@ namespace CellularAutomaton
             }
             
             Debug.Log("Cells initialized!");
-            Debug.Log(cells);
         }
 
         

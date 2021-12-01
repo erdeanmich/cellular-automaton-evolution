@@ -1,5 +1,8 @@
 using System;
+using System.Collections;
 using System.Globalization;
+using System.IO;
+using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,45 +10,53 @@ namespace CellularAutomaton
 {
     public class CellularAutomatonSceneHandler : MonoBehaviour
     {
-        [SerializeField]
-        private Button startCAButton;
-
-        [SerializeField]
+        [SerializeField] 
         private CellularAutomatonSimulation cellularAutomatonSimulation;
 
-        [Header("Simulation Inputs")]
+        [Header("Buttons")] 
+        [SerializeField] private Button startCAButton;
+
+        [SerializeField] 
+        private Button exportCAButton;
+
+        [SerializeField] 
+        private Button importCAButton;
+
+        [Header("Simulation Inputs")] 
         [SerializeField]
         private InputField seedInput;
-        
-        [SerializeField]
+
+        [SerializeField] 
         private InputField gridSizeInput;
 
-        [SerializeField]
+        [SerializeField] 
         private InputField rInput;
 
-        [SerializeField]
+        [SerializeField] 
         private InputField nInput;
 
-        [SerializeField]
+        [SerializeField] 
         private InputField tInput;
 
-        [SerializeField]
+        [SerializeField] 
         private InputField mInput;
-        
-        [SerializeField]
+
+        [SerializeField] 
         private Toggle stepByStep;
-        
+
         private void Start()
         {
-            
             startCAButton.onClick.AddListener(OnClickStart);
+            exportCAButton.onClick.AddListener(OnClickExport);
+            importCAButton.onClick.AddListener(OnClickImport);
         }
 
         private void OnClickStart()
         {
-            CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig = CreateCellularAutomatonSimulationConfig();
+            CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig =
+                CreateCellularAutomatonSimulationConfig();
             cellularAutomatonSimulation.SetConfig(cellularAutomatonSimulationConfig);
-            
+
             if (stepByStep.isOn)
             {
                 cellularAutomatonSimulation.StartSimulationSlow();
@@ -56,8 +67,57 @@ namespace CellularAutomaton
             }
         }
 
+        private void OnClickImport()
+        {
+            StartCoroutine(ShowImportAutomatonDialog());
+        }
+
+        private void OnClickExport()
+        {
+            StartCoroutine(ShowExportAutomatonToDialog());
+        }
+
+        private IEnumerator ShowImportAutomatonDialog()
+        {
+            yield break;
+        }
+
+        private IEnumerator ShowExportAutomatonToDialog()
+        {
+            FileBrowser.SetFilters(true, CellularAutomataConstants.ExportFileFilter);
+            FileBrowser.SetDefaultFilter(CellularAutomataConstants.DefaultExportFileFilter);
+            yield return FileBrowser.WaitForSaveDialog(
+                FileBrowser.PickMode.Files,
+                false,
+                null, 
+                CellularAutomataConstants.InitialExportFilename, 
+                CellularAutomataConstants.ExportDialogTitle,
+                CellularAutomataConstants.ExportSaveButtonText
+            );
+
+            if (!FileBrowser.Success)
+            {
+                yield break;
+            }
+            
+            // only one possible path here
+            var pathToFile = FileBrowser.Result[0];
+            ExportCurrentCaConfigToFile(pathToFile);
+        }
+
+        private void ExportCurrentCaConfigToFile(string pathToFile)
+        {
+            var filename = Path.GetFileName(pathToFile);
+            var directoryPath = Path.GetDirectoryName(pathToFile);
+            var simulationConfig = CreateCellularAutomatonSimulationConfig();
+            var json = JsonUtility.ToJson(simulationConfig, true);
+            var pathToJson = FileBrowserHelpers.CreateFileInDirectory(directoryPath, filename);
+            FileBrowserHelpers.WriteTextToFile(pathToJson, json);
+        }
+
         private CellularAutomatonSimulationConfig CreateCellularAutomatonSimulationConfig()
         {
+            // add error handling 
             return new CellularAutomatonSimulationConfig(
                 RetrieveSeed(),
                 RetrieveGridSize(),
@@ -102,12 +162,15 @@ namespace CellularAutomaton
                 Debug.Log($"Current seed is {_seed}");
             }
 
+            seedInput.text = _seed.ToString();
             return _seed;
         }
 
         private void OnDestroy()
         {
             startCAButton.onClick.RemoveAllListeners();
+            importCAButton.onClick.RemoveAllListeners();
+            exportCAButton.onClick.RemoveAllListeners();
         }
     }
 }

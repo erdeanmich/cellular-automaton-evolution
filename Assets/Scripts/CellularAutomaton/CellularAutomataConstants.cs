@@ -1,16 +1,25 @@
 using System.Collections.Generic;
+using SimpleFileBrowser;
 using UnityEngine;
 
 namespace CellularAutomaton
 {
-    public class CellularAutomataConstants
+    public static class CellularAutomataConstants
     {
-        public static Dictionary<CellType, Color> CELL_COLORS = new Dictionary<CellType, Color>
+        public static readonly Dictionary<CellType, Color> CellColors = new Dictionary<CellType, Color>
         {
             { CellType.Floor, Color.white },
             { CellType.Wall, Color.black },
             { CellType.Start, Color.green },
             { CellType.End, Color.red }
         };
+
+        public static readonly string InitialExportFilename = "ca.json";
+        public static readonly string DefaultExportFileFilter = ".json";
+        public static readonly string ExportDialogTitle = "Choose file location for export";
+        public static readonly string ExportSaveButtonText = "Export";
+        
+        
+        public static readonly FileBrowser.Filter ExportFileFilter = new FileBrowser.Filter("Automaton File", ".json");
     }
 }

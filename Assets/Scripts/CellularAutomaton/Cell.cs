@@ -18,7 +18,7 @@ namespace CellularAutomaton
         public void SetCellType(CellType type)
         {
             cellType = type;
-            spriteRenderer.color = CellularAutomataConstants.CELL_COLORS[cellType];
+            spriteRenderer.color = CellularAutomataConstants.CellColors[cellType];
         }
     }
 }

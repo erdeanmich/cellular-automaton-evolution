@@ -1,13 +1,16 @@
+using System;
+
 namespace CellularAutomaton
 {
+    [Serializable]
     public struct CellularAutomatonSimulationConfig
     {
-        public int Seed { get; }
-        public int GridSize { get; }
-        public float R { get; }
-        public int N { get; }
-        public int T { get; }
-        public int M { get; }
+        public int Seed;
+        public int GridSize;
+        public float R;
+        public int N;
+        public int T;
+        public int M;
 
         public CellularAutomatonSimulationConfig(int seed, int gridSize, float r, int n, int t, int m)
         {
