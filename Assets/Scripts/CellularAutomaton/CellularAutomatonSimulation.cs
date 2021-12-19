@@ -1,78 +1,57 @@
+
+using System;
 using System.Collections;
+using CellularAutomatonEvolution;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CellularAutomaton
 {
-    public class CellularAutomatonSimulation : MonoBehaviour
+    public class CellularAutomatonSimulation
     {
-        [SerializeField]
-        private int gridSize;
-
-        [SerializeField]
-        private int seed;
-
-        [SerializeField]
-        [Range(0,100)]
-        private float initialWallChance;
-
-        [SerializeField] 
-        private int caIterations;
-
-        [SerializeField] 
-        private int wallNeighborhoodThreshhold;
-
-        [SerializeField]
-        private int mooreNeighborHoodSize;
-
-        [SerializeField]
-        private CellularAutomatonVisualizer cellularAutomatonVisualizer;
-        
+        private CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig;
         private int[,] cells; 
-    
-        void Start()
+        
+
+        public int[,] GetCells()
         {
+            return cells;
         }
 
-        public void StartSimulation()
+        public void SetConfig(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
         {
-            InitializeAutomaton();
-            for (int i = 0; i < caIterations; i++)
-            {
-                UpdateAutomaton();
-            }
-            VisualizeAutomaton();
+            this.cellularAutomatonSimulationConfig = cellularAutomatonSimulationConfig;
         }
 
-        public void StartSimulationSlow()
-        {
-            InitializeAutomaton();
-            StartCoroutine(SimulateAutomatonStepByStep());
-        }
-
-        private IEnumerator SimulateAutomatonStepByStep()
-        {
-            for (int i = 0; i < caIterations; i++)
-            {
-                VisualizeAutomaton();
-                UpdateAutomaton();
-                yield return new WaitForSeconds(1);
-            }
-            VisualizeAutomaton();
-        }
-
-        private void InitializeAutomaton()
+        public void Simulate(Action visualizeAction = null)
         {
             InitializeCellGrid();
-            VisualizeAutomaton();
+            visualizeAction?.Invoke();
+            for (int i = 0; i < cellularAutomatonSimulationConfig.N; i++)
+            {
+                UpdateAutomaton();
+            }
+            visualizeAction?.Invoke();
         }
 
-        private void VisualizeAutomaton()
+        public IEnumerator SimulateSlow(Action visualizeAction)
         {
-            cellularAutomatonVisualizer.VisualizeAutomaton(cells);
+            InitializeCellGrid();
+            visualizeAction.Invoke();
+            for (int i = 0; i < cellularAutomatonSimulationConfig.N; i++)
+            {
+                UpdateAutomaton();
+                yield return new WaitForSeconds(1);
+                visualizeAction.Invoke();
+            }
         }
-
+        
         private void InitializeCellGrid()
         {
+            int gridSize = cellularAutomatonSimulationConfig.GridSize;
+            int seed = cellularAutomatonSimulationConfig.Seed;
+            double r = cellularAutomatonSimulationConfig.R;
+
             cells = new int[gridSize, gridSize];
             Random.InitState(seed);
             for (int x = 0; x < gridSize; x++)
@@ -80,39 +59,15 @@ namespace CellularAutomaton
                 for (int y = 0; y < gridSize; y++)
                 {
                     var random = Random.Range(0, 100);
-                    cells[x, y] = random <= initialWallChance ? 1 : 0;
+                    cells[x, y] = random <= r ? 1 : 0;
                 }
             }
-            
-            Debug.Log("Cells initialized!");
         }
-
         
-
-        private void UpdateAutomaton()
-        {
-            int[,] nextCells = new int[gridSize,gridSize];
-            for (int x = 0; x < gridSize; x++)
-            {
-                for (int y = 0; y < gridSize; y++)
-                {
-                    int wallCount = GetWallCountOfNeighborhood(x, y);
-                    CellType cellType = GetNextCellState(wallCount);
-                    nextCells[x, y] = (int) cellType;
-                }
-            }
-
-            cells = nextCells;
-        }
-
-        private CellType GetNextCellState(int neighborhoodWallCount)
-        {
-            return neighborhoodWallCount >= wallNeighborhoodThreshhold ? CellType.Wall : CellType.Floor;
-        }
-
         private int GetWallCountOfNeighborhood(int x, int y)
         {
             int wallCount = 0;
+            int mooreNeighborHoodSize = cellularAutomatonSimulationConfig.M;
             for (int xOffset = x - mooreNeighborHoodSize; xOffset <= x + mooreNeighborHoodSize; xOffset++)
             {
                 if (IsOffsetOutOfBounds(xOffset))
@@ -136,20 +91,32 @@ namespace CellularAutomaton
 
             return wallCount;
         }
+        
+        public void UpdateAutomaton()
+        {
+            int gridSize = cellularAutomatonSimulationConfig.GridSize;
+            int[,] nextCells = new int[gridSize,gridSize];
+            for (int x = 0; x < gridSize; x++)
+            {
+                for (int y = 0; y < gridSize; y++)
+                {
+                    int wallCount = GetWallCountOfNeighborhood(x, y);
+                    CellType cellType = GetNextCellState(wallCount);
+                    nextCells[x, y] = (int) cellType;
+                }
+            }
+
+            cells = nextCells;
+        }
+
+        private CellType GetNextCellState(int neighborhoodWallCount)
+        {
+            return neighborhoodWallCount >= cellularAutomatonSimulationConfig.T ? CellType.Wall : CellType.Floor;
+        }
 
         private bool IsOffsetOutOfBounds(int offset)
         {
-            return offset < 0 || offset > gridSize - 1;
-        }
-
-        public void SetConfig(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
-        {
-            seed = cellularAutomatonSimulationConfig.Seed;
-            initialWallChance = cellularAutomatonSimulationConfig.R;
-            caIterations = cellularAutomatonSimulationConfig.N;
-            mooreNeighborHoodSize = cellularAutomatonSimulationConfig.M;
-            wallNeighborhoodThreshhold = cellularAutomatonSimulationConfig.T;
-            gridSize = cellularAutomatonSimulationConfig.GridSize;
+            return offset < 0 || offset > cellularAutomatonSimulationConfig.GridSize - 1;
         }
     }
 }

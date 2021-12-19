@@ -7,7 +7,7 @@ namespace CellularAutomaton
     {
         public int Seed;
         public int GridSize;
-        public float R;
+        public double R;
         public int N;
         public int T;
         public int M;

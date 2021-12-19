@@ -11,7 +11,7 @@ namespace CellularAutomaton
     public class CellularAutomatonSceneHandler : MonoBehaviour
     {
         [SerializeField] 
-        private CellularAutomatonSimulation cellularAutomatonSimulation;
+        private CellularAutomatonSimulationView cellularAutomatonSimulationView;
 
         [Header("Buttons")] 
         [SerializeField] private Button startCAButton;
@@ -57,15 +57,15 @@ namespace CellularAutomaton
         {
             CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig =
                 CreateCellularAutomatonSimulationConfig();
-            cellularAutomatonSimulation.SetConfig(cellularAutomatonSimulationConfig);
+            cellularAutomatonSimulationView.SetConfig(cellularAutomatonSimulationConfig);
 
             if (stepByStep.isOn)
             {
-                cellularAutomatonSimulation.StartSimulationSlow();
+                cellularAutomatonSimulationView.StartSimulationSlow();
             }
             else
             {
-                cellularAutomatonSimulation.StartSimulation();
+                cellularAutomatonSimulationView.StartSimulation();
             }
         }
 
@@ -214,4 +214,4 @@ namespace CellularAutomaton
             exportCAButton.onClick.RemoveAllListeners();
         }
     }
-}
+}   
