@@ -15,6 +15,7 @@ namespace CellularAutomatonEvolution
         private CellularAutomatonEvolutionConfig cellularAutomatonEvolutionConfig;
         private CellularAutomatonSimulation cellularAutomatonSimulation;
         private Dictionary<CellularAutomatonSimulationConfig, int> populationWithFitness;
+        private IFitnessEvaluator fitnessEvaluator;
         private string pathToExistingPopulation;
         private bool shouldRun = false;
 
@@ -24,6 +25,7 @@ namespace CellularAutomatonEvolution
             this.cellularAutomatonEvolutionConfig = cellularAutomatonEvolutionConfig;
             this.pathToExistingPopulation = pathToExistingPopulation;
             cellularAutomatonSimulation = new CellularAutomatonSimulation();
+            fitnessEvaluator = new CellularAutomatonFitnessCalculator();
             InitNewPopulation();
         }
 
@@ -209,8 +211,7 @@ namespace CellularAutomatonEvolution
             cellularAutomatonSimulation.SetConfig(cellularAutomatonSimulationConfig);
             cellularAutomatonSimulation.Simulate();
             int[,] cells = cellularAutomatonSimulation.GetCells();
-            
-            return 1;
+            return fitnessEvaluator.DetermineFitness(cells);
         }
     }
 }

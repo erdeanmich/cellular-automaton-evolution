@@ -4670,7 +4670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9be700bb5d75403d97c1c4d4ac4fb731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellularAutomatonSimulation: {fileID: 1073056143}
+  cellularAutomatonSimulationView: {fileID: 1073056143}
   startCAButton: {fileID: 1271446546}
   exportCAButton: {fileID: 484440199}
   importCAButton: {fileID: 869090571}
