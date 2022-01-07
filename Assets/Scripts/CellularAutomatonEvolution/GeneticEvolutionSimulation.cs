@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using CellularAutomaton;
 using UnityEngine;
+using Utility;
 using Random = System.Random;
 
 namespace CellularAutomatonEvolution
@@ -37,6 +38,12 @@ namespace CellularAutomatonEvolution
             populationWithFitness = newPopulationWithFitness.OrderByDescending(x => x.Value)
                 .Take(cellularAutomatonEvolutionConfig.PopulationSize)
                 .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        public float GetAverageFitness()
+        {
+            float sum = populationWithFitness.Values.Sum();
+            return sum / populationWithFitness.Count;
         }
 
         private List<CellularAutomatonSimulationConfig> MutateOffspring(List<CellularAutomatonSimulationConfig> offspring)
@@ -109,7 +116,7 @@ namespace CellularAutomatonEvolution
             do
             {
                 var randomIndividual = GetRandomIndividualIndex(populationWithFitness);
-                if (tournamentList.ContainsKey(randomIndividual))
+                if (!tournamentList.ContainsKey(randomIndividual))
                 {
                     tournamentList.Add(randomIndividual, populationWithFitness.ElementAt(randomIndividual).Value);
                 }
@@ -143,6 +150,7 @@ namespace CellularAutomatonEvolution
             var n = GetRandomN();
             var t = GetRandomT();
             var m = GetRandomM();
+            var seed = GetRandomSeed();
 
             return new CellularAutomatonSimulationConfig
             {
@@ -151,13 +159,13 @@ namespace CellularAutomatonEvolution
                 N = n,
                 T = t,
                 R = r,
-                Seed = GetRandomSeed()
+                Seed = seed
             };
         }
 
-        private static int GetRandomSeed()
+        private int GetRandomSeed()
         {
-            return Time.time.ToString(CultureInfo.CurrentCulture).GetHashCode();
+            return RandomUtils.RandomString().GetHashCode();
         }
 
         private int GetRandomT()
