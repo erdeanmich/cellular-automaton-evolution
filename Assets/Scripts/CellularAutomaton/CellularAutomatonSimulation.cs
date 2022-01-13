@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using CellularAutomatonEvolution;
 using UnityEngine;
+using Utility;
 using Random = UnityEngine.Random;
 
 namespace CellularAutomaton
@@ -70,14 +71,14 @@ namespace CellularAutomaton
             int mooreNeighborHoodSize = cellularAutomatonSimulationConfig.M;
             for (int xOffset = x - mooreNeighborHoodSize; xOffset <= x + mooreNeighborHoodSize; xOffset++)
             {
-                if (IsOffsetOutOfBounds(xOffset))
+                if (ArrayUtils.IsIndexOutOfBounds(xOffset, cellularAutomatonSimulationConfig.GridSize))
                 {
                     continue;
                 }
                 
                 for (int yOffset = y - mooreNeighborHoodSize; yOffset <= y + mooreNeighborHoodSize; yOffset++)
                 {
-                    if (IsOffsetOutOfBounds(yOffset))
+                    if (ArrayUtils.IsIndexOutOfBounds(yOffset, cellularAutomatonSimulationConfig.GridSize))
                     {
                         continue;
                     }
@@ -112,11 +113,6 @@ namespace CellularAutomaton
         private CellType GetNextCellState(int neighborhoodWallCount)
         {
             return neighborhoodWallCount >= cellularAutomatonSimulationConfig.T ? CellType.Wall : CellType.Floor;
-        }
-
-        private bool IsOffsetOutOfBounds(int offset)
-        {
-            return offset < 0 || offset > cellularAutomatonSimulationConfig.GridSize - 1;
         }
     }
 }

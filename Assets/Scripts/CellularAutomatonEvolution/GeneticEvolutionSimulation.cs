@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using CellularAutomaton;
+using FitnessEvaluation;
 using UnityEngine;
 using Utility;
 using Random = System.Random;
@@ -25,7 +26,7 @@ namespace CellularAutomatonEvolution
             this.cellularAutomatonEvolutionConfig = cellularAutomatonEvolutionConfig;
             this.pathToExistingPopulation = pathToExistingPopulation;
             cellularAutomatonSimulation = new CellularAutomatonSimulation();
-            fitnessEvaluator = new CellularAutomatonFitnessCalculator();
+            fitnessEvaluator = new FitnessEvaluator();
             InitNewPopulation();
         }
 
