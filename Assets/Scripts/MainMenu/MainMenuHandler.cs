@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -9,14 +7,14 @@ namespace DefaultNamespace
     public class MainMenuHandler : MonoBehaviour
     {
         [SerializeField]
-        private Button manualCAButton;
+        private Button manualCaButton;
 
         [SerializeField]
         private Button caEvolutionButton;
 
         private void Start()
         {
-            manualCAButton.onClick.AddListener(OnClickManualCA);
+            manualCaButton.onClick.AddListener(OnClickManualCA);
             caEvolutionButton.onClick.AddListener(OnClickCAEvolution);
         }
 
@@ -27,12 +25,12 @@ namespace DefaultNamespace
 
         private void OnClickCAEvolution()
         {
-            //TODO create scene for CA
+            SceneManager.LoadScene("Scenes/CellularAutomataEvolution");
         }
         
         private void OnDestroy()
         {
-            manualCAButton.onClick.RemoveAllListeners();
+            manualCaButton.onClick.RemoveAllListeners();
             caEvolutionButton.onClick.RemoveAllListeners();
         }
     }

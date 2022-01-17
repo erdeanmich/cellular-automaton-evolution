@@ -5,6 +5,7 @@ using System.IO;
 using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
+using Utility;
 
 namespace CellularAutomaton
 {
@@ -148,12 +149,8 @@ namespace CellularAutomaton
 
         private void ExportCurrentCaConfigToFile(string pathToFile)
         {
-            var filename = Path.GetFileName(pathToFile);
-            var directoryPath = Path.GetDirectoryName(pathToFile);
             var simulationConfig = CreateCellularAutomatonSimulationConfig();
-            var json = JsonUtility.ToJson(simulationConfig, true);
-            var pathToJson = FileBrowserHelpers.CreateFileInDirectory(directoryPath, filename);
-            FileBrowserHelpers.WriteTextToFile(pathToJson, json);
+            FileUtils.WriteObjectAsJsonToFile(simulationConfig, pathToFile);
         }
 
         private CellularAutomatonSimulationConfig CreateCellularAutomatonSimulationConfig()

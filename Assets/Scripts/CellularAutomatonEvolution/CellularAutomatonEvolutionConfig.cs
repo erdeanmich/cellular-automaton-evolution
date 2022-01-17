@@ -2,6 +2,7 @@ using System;
 
 namespace CellularAutomatonEvolution
 {
+    [Serializable]
     public struct CellularAutomatonEvolutionConfig
     {
         public int GridSize;

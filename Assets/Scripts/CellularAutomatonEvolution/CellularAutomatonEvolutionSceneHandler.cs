@@ -1,7 +1,14 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using CellularAutomaton;
+using SimpleFileBrowser;
 using UI;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
+using Utility;
 
 namespace CellularAutomatonEvolution
 {
@@ -45,14 +52,15 @@ namespace CellularAutomatonEvolution
         
 
         private GeneticEvolutionSimulation geneticEvolutionSimulation;
-        private bool isRunning = false;
-        private int iterationCount = 0;
+        private bool isRunning;
+        private int iterationCount;
 
         private void Start()
         {
             startEvolutionButton.onClick.AddListener(OnPressStart);
             stopEvolutionButton.onClick.AddListener(OnPressStop);
             resetAllValuesButton.onClick.AddListener(OnPressResetAll);
+            exportPopulationButton.onClick.AddListener(OnPressExport);
         }
 
         private void OnDestroy()
@@ -106,7 +114,42 @@ namespace CellularAutomatonEvolution
             gridSizeInput.text = string.Empty;
             populationSizeInput.text = string.Empty;
         }
-        
+
+        private void OnPressExport()
+        {
+            StartCoroutine(ShowExportAutomataEvolutionDialog());
+        }
+
+        private IEnumerator ShowExportAutomataEvolutionDialog()
+        {
+            yield return FileBrowser.WaitForSaveDialog(
+                FileBrowser.PickMode.Files,
+                false,
+                null,
+                "population.json",
+                "Export population to file",
+                CellularAutomataConstants.ExportButtonText
+            );
+
+            if (!FileBrowser.Success)
+            {
+                yield break;
+            }
+
+            var pathToFile = FileBrowser.Result[0];
+            ExportCurrentPopulationToFile(pathToFile);
+        }
+
+        private void ExportCurrentPopulationToFile(string pathToFile)
+        {
+            var cellularAutomatonEvolutionConfigExport = new CellularAutomatonEvolutionConfigExport
+            {
+                cellularAutomatonEvolutionConfig = geneticEvolutionSimulation.GetEvolutionConfig(),
+                population = geneticEvolutionSimulation.GetPopulation()
+            };
+            FileUtils.WriteObjectAsJsonToFile(cellularAutomatonEvolutionConfigExport, pathToFile);
+        }
+
         private CellularAutomatonEvolutionConfig CreateCellularAutomatonEvolutionConfig()
         {
             return new CellularAutomatonEvolutionConfig

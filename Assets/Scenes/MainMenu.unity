@@ -363,7 +363,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 0
+  m_Interactable: 1
   m_TargetGraphic: {fileID: 963973744}
   m_OnClick:
     m_PersistentCalls:
@@ -878,7 +878,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d4976823594a99688627be592e0f6ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manualCAButton: {fileID: 2133494519}
+  manualCaButton: {fileID: 2133494519}
   caEvolutionButton: {fileID: 963973743}
 --- !u!1 &2133494517
 GameObject:

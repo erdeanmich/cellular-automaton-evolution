@@ -17,20 +17,26 @@ namespace FitnessEvaluation
 
             // amount of rocks - the more walls the better
             int wallPoints = DetermineAmountOfWalls();
-            int total = cellsToInvestigate.GetLength(0) * cellsToInvestigate.GetLength(0);
-            float percentage =  wallPoints / (float) total;
             List<Cave> caves = DetermineAllCaves();
-            int sizeOfBiggestCave;
-            if (caves.Count == 0)
+            List<Cave> floorCaves = caves.FindAll(x => x.GetType() == CellType.Floor);
+            int countOfRockIslands = caves.Count - floorCaves.Count;
+            int averageSizeOfRockIslands = 0;
+            if (countOfRockIslands >= 1)
             {
-                sizeOfBiggestCave = 0;
+                averageSizeOfRockIslands = wallPoints / countOfRockIslands;
+            }
+            
+            int sizeOfBiggestFloorCave;
+            if (floorCaves.Count == 0)
+            {
+                sizeOfBiggestFloorCave = 0;
             }
             else
             {
-                sizeOfBiggestCave = caves.Last()?.GetSize() ?? 0;
+                sizeOfBiggestFloorCave = floorCaves.Last()?.GetSize() ?? 0;
             }
    
-            return (int) (percentage * sizeOfBiggestCave);
+            return (int) (sizeOfBiggestFloorCave * countOfRockIslands) + averageSizeOfRockIslands;
         }
 
         private int DetermineAmountOfWalls()
@@ -50,18 +56,15 @@ namespace FitnessEvaluation
             {
                 for (int y = 0; y < cells.GetLength(1); y++)
                 {
-                    if (cells[x, y] == (int)CellType.Floor)
-                    {
-                        FloodCell(floodedCells, x, y, floodColor, cavesByFloodColor);
-                        floodColor++;
-                    }
+                    FloodCell(floodedCells, x, y, floodColor, cavesByFloodColor, cells[x, y]);
+                    floodColor++;
                 }
             }
 
             return cavesByFloodColor.Values.ToList();
         }
 
-        private void FloodCell(int[,] floodedCells, int x, int y, int floodColor, Dictionary<int, Cave> cavesByFloodColor)
+        private void FloodCell(int[,] floodedCells, int x, int y, int floodColor, Dictionary<int, Cave> cavesByFloodColor, int cellType)
         {
             int cellLength = floodedCells.GetLength(0);
             if (ArrayUtils.IsIndexOutOfBounds(x, cellLength) || ArrayUtils.IsIndexOutOfBounds(y, cellLength))
@@ -76,26 +79,24 @@ namespace FitnessEvaluation
                 return;
             }
 
-            if (cells[x, y] == (int)CellType.Wall)
+            if (cells[x, y] != cellType)
             {
-                // stop flooding, this is a wall
+                // stop flooding, this is not the cellType we are currently flooding
                 return;
             }
 
             floodedCells[x, y] = floodColor;
             if (!cavesByFloodColor.ContainsKey(floodColor))
             {
-                cavesByFloodColor[floodColor] = new Cave();
+                cavesByFloodColor[floodColor] = new Cave((CellType)cellType);
             }
             
             cavesByFloodColor[floodColor].AddCell(x,y);
             
-            FloodCell(floodedCells, x + 1, y, floodColor, cavesByFloodColor);
-            FloodCell(floodedCells, x - 1, y, floodColor, cavesByFloodColor);
-            FloodCell(floodedCells, x, y + 1, floodColor, cavesByFloodColor);
-            FloodCell(floodedCells, x, y - 1, floodColor, cavesByFloodColor);
+            FloodCell(floodedCells, x + 1, y, floodColor, cavesByFloodColor, cellType);
+            FloodCell(floodedCells, x - 1, y, floodColor, cavesByFloodColor, cellType);
+            FloodCell(floodedCells, x, y + 1, floodColor, cavesByFloodColor, cellType);
+            FloodCell(floodedCells, x, y - 1, floodColor, cavesByFloodColor, cellType);
         }
-        
-        
     }
 }

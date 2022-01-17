@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using CellularAutomaton;
 using FitnessEvaluation;
@@ -13,12 +12,12 @@ namespace CellularAutomatonEvolution
 {
     public class GeneticEvolutionSimulation
     {
-        private CellularAutomatonEvolutionConfig cellularAutomatonEvolutionConfig;
-        private CellularAutomatonSimulation cellularAutomatonSimulation;
+        private readonly CellularAutomatonEvolutionConfig cellularAutomatonEvolutionConfig;
+        private readonly CellularAutomatonSimulation cellularAutomatonSimulation;
         private Dictionary<CellularAutomatonSimulationConfig, int> populationWithFitness;
-        private IFitnessEvaluator fitnessEvaluator;
+        private readonly IFitnessEvaluator fitnessEvaluator;
         private string pathToExistingPopulation;
-        private bool shouldRun = false;
+        private readonly Random rng;
 
         public GeneticEvolutionSimulation(CellularAutomatonEvolutionConfig cellularAutomatonEvolutionConfig,
             string pathToExistingPopulation = null)
@@ -27,6 +26,7 @@ namespace CellularAutomatonEvolution
             this.pathToExistingPopulation = pathToExistingPopulation;
             cellularAutomatonSimulation = new CellularAutomatonSimulation();
             fitnessEvaluator = new FitnessEvaluator();
+            rng = new Random();
             InitNewPopulation();
         }
 
@@ -49,24 +49,33 @@ namespace CellularAutomatonEvolution
             return sum / populationWithFitness.Count;
         }
 
-        private List<CellularAutomatonSimulationConfig> MutateOffspring(List<CellularAutomatonSimulationConfig> offspring)
+        private List<CellularAutomatonSimulationConfig> MutateOffspring(
+            List<CellularAutomatonSimulationConfig> offspring)
         {
-            var rng = new Random();
-            return offspring.ConvertAll(x => new CellularAutomatonSimulationConfig
+            return offspring.ConvertAll(x =>
             {
-                Seed = x.Seed,
-                GridSize = x.GridSize,
-                M = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomM() : x.M,
-                N = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomN() : x.N,
-                T = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomT() : x.T,
-                R = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomR() : x.R
+                var m = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomM() : x.M;
+                var n = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomN() : x.N;
+                var t = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomT() : x.T;
+                var r = rng.NextDouble() <= CellularAutomatonEvolutionConstants.MutationChance ? GetRandomR() : x.R;
+                
+                return new CellularAutomatonSimulationConfig
+                {
+                    Seed = x.Seed,
+                    GridSize = x.GridSize,
+                    M = m,
+                    N = n,
+                    T = t,
+                    R = r
+                };
             });
         }
 
-        private List<CellularAutomatonSimulationConfig> CreateOffspringFromParents(List<CellularAutomatonSimulationConfig> parents)
+        private List<CellularAutomatonSimulationConfig> CreateOffspringFromParents(
+            List<CellularAutomatonSimulationConfig> parents)
         {
             List<CellularAutomatonSimulationConfig> offspring = new List<CellularAutomatonSimulationConfig>();
-            
+
             foreach (var parent in parents)
             {
                 CellularAutomatonSimulationConfig other;
@@ -78,15 +87,16 @@ namespace CellularAutomatonEvolution
 
                 offspring.Add(RecombineParents(parent, other));
             }
-            
+
             return offspring;
         }
 
-        private CellularAutomatonSimulationConfig RecombineParents(CellularAutomatonSimulationConfig parent1, CellularAutomatonSimulationConfig parent2)
+        private CellularAutomatonSimulationConfig RecombineParents(CellularAutomatonSimulationConfig parent1,
+            CellularAutomatonSimulationConfig parent2)
         {
             return new CellularAutomatonSimulationConfig
             {
-                Seed = Time.time.ToString(CultureInfo.CurrentCulture).GetHashCode(),
+                Seed = GetRandomSeed(),
                 GridSize = cellularAutomatonEvolutionConfig.GridSize,
                 M = GetRandomValueFromPair(parent1.M, parent2.M),
                 R = GetRandomValueFromPair(parent1.R, parent2.R),
@@ -97,9 +107,8 @@ namespace CellularAutomatonEvolution
 
         private T GetRandomValueFromPair<T>(T first, T second)
         {
-            var rng = new Random();
             var list = new List<T> { first, second };
-            return list[rng.Next(0,list.Count)];
+            return list[rng.Next(0, list.Count)];
         }
 
         private List<CellularAutomatonSimulationConfig> ChooseParents()
@@ -132,18 +141,19 @@ namespace CellularAutomatonEvolution
 
         private int GetRandomIndividualIndex(ICollection collection)
         {
-            var rng = new Random();
             return rng.Next(collection.Count);
         }
-        
+
         private void InitNewPopulation()
         {
             //TODO take path into account 
-            CellularAutomatonSimulationConfig[] population = new CellularAutomatonSimulationConfig[cellularAutomatonEvolutionConfig.PopulationSize];
+            CellularAutomatonSimulationConfig[] population =
+                new CellularAutomatonSimulationConfig[cellularAutomatonEvolutionConfig.PopulationSize];
             for (int i = 0; i < population.Length; i++)
             {
                 population[i] = CreateRandomCellularSimulationConfigWithinBounds();
             }
+
             populationWithFitness = CalcFitnessForCurrentPopulation(population);
         }
 
@@ -173,46 +183,61 @@ namespace CellularAutomatonEvolution
 
         private int GetRandomT()
         {
-            var rng = new Random();
             return rng.Next(cellularAutomatonEvolutionConfig.maxT + 1);
         }
 
         private int GetRandomN()
         {
-            var rng = new Random();
             return rng.Next(cellularAutomatonEvolutionConfig.maxN + 1);
         }
-        
+
         private int GetRandomM()
         {
-            var rng = new Random();
             return rng.Next(cellularAutomatonEvolutionConfig.maxM + 1);
         }
 
         private double GetRandomR()
         {
-            var rng = new Random();
             return rng.NextDouble() * cellularAutomatonEvolutionConfig.maxR;
         }
 
-        private Dictionary<CellularAutomatonSimulationConfig,int> CalcFitnessForCurrentPopulation(CellularAutomatonSimulationConfig[] population)
+        private Dictionary<CellularAutomatonSimulationConfig, int> CalcFitnessForCurrentPopulation(
+            CellularAutomatonSimulationConfig[] population)
         {
-            Dictionary<CellularAutomatonSimulationConfig,int> fitnessForPopulation = new Dictionary<CellularAutomatonSimulationConfig, int>();
+            Dictionary<CellularAutomatonSimulationConfig, int> fitnessForPopulation =
+                new Dictionary<CellularAutomatonSimulationConfig, int>();
             foreach (CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig in population)
             {
-                int fitness = CalcFitnessForCellularAutomaton(cellularAutomatonSimulationConfig);
-                fitnessForPopulation.Add(cellularAutomatonSimulationConfig, fitness);
+                try
+                {
+                    int fitness = CalcFitnessForCellularAutomaton(cellularAutomatonSimulationConfig);
+                    fitnessForPopulation.Add(cellularAutomatonSimulationConfig, fitness);
+                }
+                catch (ArgumentException e)
+                {
+                    Debug.LogError(e);
+                }
             }
 
             return fitnessForPopulation;
         }
-        
+
         private int CalcFitnessForCellularAutomaton(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
         {
             cellularAutomatonSimulation.SetConfig(cellularAutomatonSimulationConfig);
             cellularAutomatonSimulation.Simulate();
             int[,] cells = cellularAutomatonSimulation.GetCells();
             return fitnessEvaluator.DetermineFitness(cells);
+        }
+
+        public List<CellularAutomatonSimulationConfig> GetPopulation()
+        {
+            return populationWithFitness.Keys.ToList();
+        }
+
+        public CellularAutomatonEvolutionConfig GetEvolutionConfig()
+        {
+            return cellularAutomatonEvolutionConfig;
         }
     }
 }
