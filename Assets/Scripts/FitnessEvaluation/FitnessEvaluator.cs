@@ -11,39 +11,25 @@ namespace FitnessEvaluation
     {
         private int[,] cells;
 
-        public int DetermineFitness(int[,] cellsToInvestigate)
+        public double DetermineFitness(int[,] cellsToInvestigate)
         {
             cells = cellsToInvestigate;
-
-            // amount of rocks - the more walls the better
-            int wallPoints = DetermineAmountOfWalls();
             List<Cave> caves = DetermineAllCaves();
             List<Cave> floorCaves = caves.FindAll(x => x.GetType() == CellType.Floor);
-            int countOfRockIslands = caves.Count - floorCaves.Count;
-            int averageSizeOfRockIslands = 0;
-            if (countOfRockIslands >= 1)
+            floorCaves.Sort();
+            List<Cave> wallCaves = caves.FindAll(x => x.GetType() == CellType.Wall && x.GetSize() > 50);
+            wallCaves.Sort();
+            int countOfWallIslands = wallCaves.Count;
+
+            int sizeOfBiggestFloorCave = 0;
+            if (floorCaves.Count > 0)
             {
-                averageSizeOfRockIslands = wallPoints / countOfRockIslands;
+                sizeOfBiggestFloorCave = floorCaves.Last().GetSize();
             }
-            
-            int sizeOfBiggestFloorCave;
-            if (floorCaves.Count == 0)
-            {
-                sizeOfBiggestFloorCave = 0;
-            }
-            else
-            {
-                sizeOfBiggestFloorCave = floorCaves.Last()?.GetSize() ?? 0;
-            }
-   
-            return (int) (sizeOfBiggestFloorCave * countOfRockIslands) + averageSizeOfRockIslands;
+
+            return (sizeOfBiggestFloorCave * 0.1 * countOfWallIslands);
         }
 
-        private int DetermineAmountOfWalls()
-        {
-            return cells.Cast<int>().Count(cell => cell == (int)CellType.Wall);
-        }
-        
         private List<Cave> DetermineAllCaves()
         {
             // have a floodarray

@@ -1,3 +1,4 @@
+using FitnessEvaluation;
 using UnityEngine;
 
 namespace CellularAutomaton
@@ -8,6 +9,8 @@ namespace CellularAutomaton
         private CellularAutomatonVisualizer cellularAutomatonVisualizer;
 
         private readonly CellularAutomatonSimulation cellularAutomatonSimulation = new CellularAutomatonSimulation();
+        private FitnessEvaluator _fitnessEvaluator =  new FitnessEvaluator();
+
 
         public void StartSimulation()
         {
@@ -25,6 +28,9 @@ namespace CellularAutomaton
             {
                 cellularAutomatonVisualizer.VisualizeAutomaton(cellularAutomatonSimulation.GetCells());
             }
+
+            double fitness = _fitnessEvaluator.DetermineFitness(cellularAutomatonSimulation.GetCells());
+            Debug.Log(fitness);
         }
         
         public void SetConfig(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)

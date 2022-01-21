@@ -2,6 +2,6 @@ namespace CellularAutomatonEvolution
 {
     public interface IFitnessEvaluator
     {
-        int DetermineFitness(int[,] cellsToInvestigate);
+        double DetermineFitness(int[,] cellsToInvestigate);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Globalization;
 using System.IO;
+using FitnessEvaluation;
 using SimpleFileBrowser;
 using UnityEngine;
 using UnityEngine.UI;
@@ -44,7 +45,7 @@ namespace CellularAutomaton
 
         [SerializeField] 
         private Toggle stepByStep;
-
+        
         private void Start()
         {
             SetFileBrowserFilters();

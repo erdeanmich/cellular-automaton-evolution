@@ -14,7 +14,7 @@ namespace CellularAutomatonEvolution
     {
         private readonly CellularAutomatonEvolutionConfig cellularAutomatonEvolutionConfig;
         private readonly CellularAutomatonSimulation cellularAutomatonSimulation;
-        private Dictionary<CellularAutomatonSimulationConfig, int> populationWithFitness;
+        private Dictionary<CellularAutomatonSimulationConfig, double> populationWithFitness;
         private readonly IFitnessEvaluator fitnessEvaluator;
         private string pathToExistingPopulation;
         private readonly Random rng;
@@ -43,9 +43,9 @@ namespace CellularAutomatonEvolution
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
-        public float GetAverageFitness()
+        public double GetAverageFitness()
         {
-            float sum = populationWithFitness.Values.Sum();
+            double sum = populationWithFitness.Values.Sum();
             return sum / populationWithFitness.Count;
         }
 
@@ -124,7 +124,7 @@ namespace CellularAutomatonEvolution
 
         private CellularAutomatonSimulationConfig ChooseParent()
         {
-            var tournamentList = new Dictionary<int, int>();
+            var tournamentList = new Dictionary<int, double>();
             do
             {
                 var randomIndividual = GetRandomIndividualIndex(populationWithFitness);
@@ -183,17 +183,17 @@ namespace CellularAutomatonEvolution
 
         private int GetRandomT()
         {
-            return rng.Next(cellularAutomatonEvolutionConfig.maxT + 1);
+            return rng.Next(1,cellularAutomatonEvolutionConfig.maxT + 1);
         }
 
         private int GetRandomN()
         {
-            return rng.Next(cellularAutomatonEvolutionConfig.maxN + 1);
+            return rng.Next(1,cellularAutomatonEvolutionConfig.maxN + 1);
         }
 
         private int GetRandomM()
         {
-            return rng.Next(cellularAutomatonEvolutionConfig.maxM + 1);
+            return rng.Next(1,cellularAutomatonEvolutionConfig.maxM + 1);
         }
 
         private double GetRandomR()
@@ -201,16 +201,16 @@ namespace CellularAutomatonEvolution
             return rng.NextDouble() * cellularAutomatonEvolutionConfig.maxR;
         }
 
-        private Dictionary<CellularAutomatonSimulationConfig, int> CalcFitnessForCurrentPopulation(
+        private Dictionary<CellularAutomatonSimulationConfig, double> CalcFitnessForCurrentPopulation(
             CellularAutomatonSimulationConfig[] population)
         {
-            Dictionary<CellularAutomatonSimulationConfig, int> fitnessForPopulation =
-                new Dictionary<CellularAutomatonSimulationConfig, int>();
+            Dictionary<CellularAutomatonSimulationConfig, double> fitnessForPopulation =
+                new Dictionary<CellularAutomatonSimulationConfig, double>();
             foreach (CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig in population)
             {
                 try
                 {
-                    int fitness = CalcFitnessForCellularAutomaton(cellularAutomatonSimulationConfig);
+                    double fitness = CalcFitnessForCellularAutomaton(cellularAutomatonSimulationConfig);
                     fitnessForPopulation.Add(cellularAutomatonSimulationConfig, fitness);
                 }
                 catch (ArgumentException e)
@@ -222,7 +222,7 @@ namespace CellularAutomatonEvolution
             return fitnessForPopulation;
         }
 
-        private int CalcFitnessForCellularAutomaton(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
+        private double CalcFitnessForCellularAutomaton(CellularAutomatonSimulationConfig cellularAutomatonSimulationConfig)
         {
             cellularAutomatonSimulation.SetConfig(cellularAutomatonSimulationConfig);
             cellularAutomatonSimulation.Simulate();

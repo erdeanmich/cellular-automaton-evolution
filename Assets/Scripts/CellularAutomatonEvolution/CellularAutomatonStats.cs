@@ -27,7 +27,7 @@ namespace CellularAutomatonEvolution
             }
         }
 
-        public void UpdateStats(int iteration, float fitness)
+        public void UpdateStats(int iteration, double fitness)
         {
             currentIterationCount.text = iteration.ToString();
             averageFitness.text = fitness.ToString(CultureInfo.CurrentCulture);
