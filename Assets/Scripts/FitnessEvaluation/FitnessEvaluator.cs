@@ -27,7 +27,13 @@ namespace FitnessEvaluation
                 sizeOfBiggestFloorCave = floorCaves.Last().GetSize();
             }
 
-            return (sizeOfBiggestFloorCave * 0.1 * countOfWallIslands);
+            int sizeOfBiggestWallCave = 0;
+            if (wallCaves.Count > 2)
+            {
+                sizeOfBiggestWallCave = wallCaves.Last().GetSize();
+            }
+
+            return (sizeOfBiggestFloorCave + sizeOfBiggestWallCave) * 0.1 * countOfWallIslands;
         }
 
         private List<Cave> DetermineAllCaves()
